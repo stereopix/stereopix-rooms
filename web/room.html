@@ -29,7 +29,8 @@ window.addEventListener('message', function(e) {
 });
 
 function change_page(page) {
-	if (viewer) viewer.postMessage({'stereopix_action': 'goto', 'position': page}, 'https://stereopix.net');
+	if (viewer && document.getElementById("chk_follow").checked)
+		viewer.postMessage({'stereopix_action': 'goto', 'position': page}, 'https://stereopix.net');
 	current_page = page;
 }
 
@@ -96,6 +97,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
 		</script>
 		<p>Room name: <span id="room_name">Unknown</span></p>
 		<p>Connected: <span id="connected">No</span></p>
+		<p><label><input type="checkbox" id="chk_follow" checked /> Change image with the presenter</label></p>
 		<p><input type="button" id="btn_sync" value="Go to current image" /></p>
 		<p id="error_log"></p>
 		<iframe title="Stereoscopic (3D) photo viewer" id="stereopix_viewer"
