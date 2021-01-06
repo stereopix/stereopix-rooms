@@ -10,8 +10,29 @@
 		<h1>Stereopix ROOMS</h1>
 		<p class="subtitle"><a href="/">ROOMS</a> uses the viewer of <a href="https://stereopix.net/">Stereopix</a> to create interactive rooms.</p>
 		<script>
+let viewer = null;
+let init_json = null;
+let init_position = null;
+
+window.addEventListener('message', function(e) {
+	if (e.origin == 'https://stereopix.net') {
+		if (e.data.type == 'viewerReady') {
+			viewer = e.source;
+			if (init_json) {
+				viewer.postMessage({'stereopix_action': 'list_add_json', 'media': init_json}, 'https://stereopix.net');
+				init_json = null;
+			}
+			if (init_position) {
+				viewer.postMessage({'stereopix_action': 'goto', 'position': init_position}, 'https://stereopix.net');
+				init_position = null;
+			}
+		}
+	}
+});
+
 function change_page(page) {
-	document.getElementById('error_log').innerText = "Page " + page; // TODO Link to the viewer
+	if (viewer) viewer.postMessage({'stereopix_action': 'goto', 'position': page}, 'https://stereopix.net');
+	else init_position = page;
 }
 
 function connect(room) {
@@ -32,7 +53,9 @@ function connect(room) {
 			document.getElementById('error_log').innerText = "This room is not currently opened, please come back later."
 
 		} else if (j.type == 'room_opened') {
-			// TODO Link j.json to the viewer
+			const json = JSON.parse(j.json);
+			if (viewer) viewer.postMessage({'stereopix_action': 'list_add_json', 'media': json}, 'https://stereopix.net');
+			else init_json = json;
 			change_page(j.page);
 
 		} else if (j.type == 'page_changed') {
@@ -69,5 +92,9 @@ window.addEventListener("DOMContentLoaded", (event) => {
 		<p>Room name: <span id="room_name">Unknown</span></p>
 		<p>Connected: <span id="connected">No</span></p>
 		<p id="error_log"></p>
+		<iframe title="Stereoscopic (3D) photo viewer" id="stereopix_viewer"
+			style="width: 100%; height: 960px; max-height: 100vh; max-width: 100vw; border: 2px solid black; margin: 8px 0;" 
+			allowfullscreen="yes" allowvr="yes" allow="fullscreen;xr-spatial-tracking;accelerometer;gyroscope" 
+			src="https://stereopix.net/viewer?embed"></iframe>
 	</body>
 </html>
