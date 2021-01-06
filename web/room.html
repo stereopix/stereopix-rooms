@@ -54,8 +54,12 @@ function connect(room) {
 
 		} else if (j.type == 'room_opened') {
 			const json = JSON.parse(j.json);
-			if (viewer) viewer.postMessage({'stereopix_action': 'list_add_json', 'media': json}, 'https://stereopix.net');
-			else init_json = json;
+			if (viewer) {
+				viewer.postMessage({'stereopix_action': 'list_clear'}, 'https://stereopix.net');
+				viewer.postMessage({'stereopix_action': 'list_add_json', 'media': json}, 'https://stereopix.net');
+			} else {
+				init_json = json;
+			}
 			change_page(j.page);
 
 		} else if (j.type == 'page_changed') {

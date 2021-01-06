@@ -33,6 +33,7 @@ class Room:
     async def open(self, j):
         self.is_opened = True
         self.json = j
+        await self.notify_clients({ 'type': 'room_opened', 'json': self.json, 'page': self.page })
 
     async def close(self):
         clients = self.clients.copy()
