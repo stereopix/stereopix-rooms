@@ -9,6 +9,10 @@
 	<body class="centered">
 		<h1>Stereopix ROOMS</h1>
 		<script>
+function change_page(page) {
+	document.getElementById('error_log').innerText = "Page " + page; // TODO Link to the viewer
+}
+
 function connect(room) {
 	let socket = new WebSocket("ws" + (document.location.protocol == "https:" ? "s" : "") + "://" + document.location.host + "/ws");
 	socket.onopen = function(e) {
@@ -25,6 +29,13 @@ function connect(room) {
 
 		if (j.type == 'room_currently_closed') {
 			document.getElementById('error_log').innerText = "This room is not currently opened, please come back later."
+
+		} else if (j.type == 'room_opened') {
+			// TODO Link j.json to the viewer
+			change_page(j.page);
+
+		} else if (j.type == 'page_changed') {
+			change_page(j.page);
 		}
 	};
 

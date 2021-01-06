@@ -18,7 +18,7 @@ function connect(room) {
 		document.getElementById("connected").innerText = "Yes";
 		document.getElementById("connected_clients").innerText = "0";
 		document.body.classList.remove('error');
-		document.getElementById('json_block').style.display = 'block';
+		document.getElementById('presenter_block').style.display = 'block';
 		socket.send(JSON.stringify({ 'type': 'init_room', 'room': room }));
 	};
 
@@ -43,7 +43,7 @@ function connect(room) {
 		document.getElementById("connected").innerText = "No";
 		document.getElementById("connected_clients").innerText = "0";
 		document.body.classList.add('error');
-		document.getElementById('json_block').style.display = 'none';
+		document.getElementById('presenter_block').style.display = 'none';
 	};
 
 	socket.onerror = function(error) {
@@ -63,6 +63,11 @@ window.addEventListener("DOMContentLoaded", (event) => {
 		if (socket)
 			socket.send(JSON.stringify({ 'type': 'open_room', 'json': document.getElementById("json_code").value }));
 	});
+	document.getElementById("page_form").addEventListener("submit", e => {
+		e.preventDefault();
+		if (socket)
+			socket.send(JSON.stringify({ 'type': 'change_page', 'page': document.getElementById("page").value }));
+	});
 	if (room)
 		connect(room);
 });
@@ -71,9 +76,17 @@ window.addEventListener("DOMContentLoaded", (event) => {
 		<p>Connected: <span id="connected">No</span></p>
 		<p>Connected clents: <span id="connected_clients">0</span></p>
 		<p id="error_log"></p>
-		<div id="json_block" style="display:none">
+		<div id="presenter_block" style="display:none">
+		<h2>JSON</h2>
 		<form id="json_form">
 			<textarea id="json_code" style="width: 90%; min-height: 200px"></textarea>
+			<br />
+			<input type="submit" />
+		</form>
+
+		<h2>Page number</h2>
+		<form id="page_form">
+			<input type="number" value)"0" id="page" style="width: 90%;" />
 			<br />
 			<input type="submit" />
 		</form>
