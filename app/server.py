@@ -32,7 +32,9 @@ async def websocket_handler(request):
                     j = json.loads(msg.data)
                     await websocket_json_msg(ws, j)
                 except json.decoder.JSONDecodeError:
-                    await ws.send_str(json.dumps({'type': 'kick' }))
+                    msg = {'type': 'kick' }
+                    await ws.send_str(json.dumps(msg))
+                    print('>', msg)
                     await ws.close()
         elif msg.type == aiohttp.WSMsgType.ERROR:
             print('ws connection closed with exception %s' % ws.exception())

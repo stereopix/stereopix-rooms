@@ -36,14 +36,15 @@ rooms = {}
 
 async def send(ws, obj):
     if not ws.closed:
+        print('>', obj)
         await ws.send_str(json.dumps(obj))
 
 async def kick(ws): 
-    await ws.send_str(json.dumps({'type': 'kick' }))
+    await send(ws, {'type': 'kick' })
     await ws.close()
 
 async def websocket_json_msg(ws, json): 
-    print(json)
+    print('<', json)
     if not 'type' in json: await kick(ws)
 
     if json['type'] == 'connection_closed':
