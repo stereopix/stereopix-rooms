@@ -2,6 +2,17 @@
 
 import json
 
+rooms = {}
+
+async def send(ws, obj):
+    if not ws.closed:
+        print('>', obj)
+        await ws.send_str(json.dumps(obj))
+
+async def kick(ws):
+    await send(ws, {'type': 'kick' })
+    await ws.close()
+
 class Room:
     def __init__(self, name, ws):
         self.name = name
@@ -41,31 +52,37 @@ class Room:
             await send(w, { 'type': 'room_closed' })
             await w.close()
 
-rooms = {}
+async def presenter_msg(ws, json):
+    room = ws.userData['room']
+    if json['type'] == 'connection_closed':
+        await room.close()
+        rooms.pop(room.name, None)
 
-async def send(ws, obj):
-    if not ws.closed:
-        print('>', obj)
-        await ws.send_str(json.dumps(obj))
+    elif json['type'] == 'open_room':
+        if not 'json' in json: kick(ws)
+        await room.open(json['json'])
 
-async def kick(ws): 
-    await send(ws, {'type': 'kick' })
-    await ws.close()
+    elif json['type'] == 'change_page':
+        if not 'page' in json: kick(ws)
+        await room.change_page(json['page'])
 
-async def websocket_json_msg(ws, json): 
+    else:
+        kick(ws)
+
+async def client_msg(ws, json):
+    room = ws.userData['room']
+    if json['type'] == 'connection_closed':
+        await room.quit(ws)
+
+    else:
+        kick(ws)
+
+async def websocket_json_msg(ws, json):
     print('<', json)
     if not 'type' in json: await kick(ws)
+    if 'role' in ws.userData: await ws.userData['role'](ws, json)
 
-    if json['type'] == 'connection_closed':
-        if 'presents' in ws.userData:
-            room = ws.userData['presents']
-            await room.close()
-            rooms.pop(room.name, None)
-        elif 'room' in ws.userData:
-            room = ws.userData['room']
-            await room.quit(ws)
-
-    elif json['type'] == 'connect':
+    if json['type'] == 'connect':
         if not 'room' in json: kick(ws)
         r = json['room']
         if not r in rooms or not rooms[r].is_opened:
@@ -73,6 +90,7 @@ async def websocket_json_msg(ws, json):
             await ws.close()
         else:
             await rooms[r].join(ws)
+            ws.userData['role'] = client_msg
             ws.userData['room'] = rooms[r]
 
     elif json['type'] == 'init_room':
@@ -83,12 +101,6 @@ async def websocket_json_msg(ws, json):
             await ws.close()
         else:
             rooms[r] = Room(r, ws)
-            ws.userData['presents'] = rooms[r]
+            ws.userData['role'] = presenter_msg
+            ws.userData['room'] = rooms[r]
 
-    elif json['type'] == 'open_room':
-        if not 'json' in json: kick(ws)
-        await ws.userData['presents'].open(json['json'])
-
-    elif json['type'] == 'change_page':
-        if not 'page' in json: kick(ws)
-        await ws.userData['presents'].change_page(json['page'])
