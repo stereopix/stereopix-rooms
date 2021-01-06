@@ -19,3 +19,12 @@ a {
 	font-weight: bold;
 	color: #f00000;
 }
+.subtitle {
+	font-weight: bold;
+	font-style: italic;
+	color: #636;
+}
+.subtitle a {
+	color: #636;
+	text-decoration: underline;
+}
