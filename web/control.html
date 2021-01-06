@@ -80,6 +80,11 @@ window.addEventListener("DOMContentLoaded", (event) => {
 	if (room)
 		connect(room);
 });
+window.addEventListener("beforeunload", e => {
+	const msg = "By closing this page, you will close the room";
+	e.returnValue = msg;
+	return msg;
+});
 		</script>
 		<p>Room name: <span id="room_name">Unknown</span></p>
 		<p>Connected: <span id="connected">No</span></p>
