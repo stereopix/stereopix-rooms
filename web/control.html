@@ -61,8 +61,16 @@ window.addEventListener("DOMContentLoaded", (event) => {
 	});
 	document.getElementById("json_form").addEventListener("submit", e => {
 		e.preventDefault();
-		if (socket)
-			socket.send(JSON.stringify({ 'type': 'open_room', 'json': document.getElementById("json_code").value }));
+		let j = null;
+		try {
+			JSON.parse(document.getElementById("json_code").value);
+			j = document.getElementById("json_code").value;
+		} catch(e) {
+			alert("Invalid JSON syntax");
+			console.warn(e);
+		}
+		if (socket && j)
+			socket.send(JSON.stringify({ 'type': 'open_room', 'json': j }));
 	});
 	document.getElementById("page_form").addEventListener("submit", e => {
 		e.preventDefault();
