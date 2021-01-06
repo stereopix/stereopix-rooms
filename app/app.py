@@ -18,9 +18,11 @@ class Room:
     async def join(self, w):
         self.clients.add(w)
         await send(w, { 'type': 'room_opened', 'json': self.json })
+        await send(self.presenter, { 'type': 'nb_connected', 'nb': len(self.clients) })
 
     async def quit(self, w):
         self.clients.discard(w)
+        await send(self.presenter, { 'type': 'nb_connected', 'nb': len(self.clients) })
 
     async def open(self, j):
         self.is_opened = True

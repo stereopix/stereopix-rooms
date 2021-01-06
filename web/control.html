@@ -16,6 +16,7 @@ function connect(room) {
 		console.log("[open] Connection established");
 		document.getElementById("room_name").innerText = room;
 		document.getElementById("connected").innerText = "Yes";
+		document.getElementById("connected_clients").innerText = "0";
 		document.body.classList.remove('error');
 		document.getElementById('json_block').style.display = 'block';
 		socket.send(JSON.stringify({ 'type': 'init_room', 'room': room }));
@@ -27,6 +28,9 @@ function connect(room) {
 
 		if (j.type == 'room_already_opened') {
 			document.getElementById('error_log').innerText = "This room is already opened."
+
+		} else if (j.type == 'nb_connected') {
+			document.getElementById("connected_clients").innerText = j.nb;
 		}
 	};
 
@@ -37,6 +41,7 @@ function connect(room) {
 			console.log('[close] Connection died');
 		}
 		document.getElementById("connected").innerText = "No";
+		document.getElementById("connected_clients").innerText = "0";
 		document.body.classList.add('error');
 		document.getElementById('json_block').style.display = 'none';
 	};
@@ -64,6 +69,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
 		</script>
 		<p>Room name: <span id="room_name">Unknown</span></p>
 		<p>Connected: <span id="connected">No</span></p>
+		<p>Connected clents: <span id="connected_clients">0</span></p>
 		<p id="error_log"></p>
 		<div id="json_block" style="display:none">
 		<form id="json_form">
