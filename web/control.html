@@ -20,7 +20,7 @@ function connect(room) {
 		document.getElementById("connected_clients").innerText = "0";
 		document.body.classList.remove('error');
 		document.getElementById('presenter_block').style.display = 'block';
-		socket.send(JSON.stringify({ 'type': 'init_room', 'room': room }));
+		socket.send(JSON.stringify({ 'type': 'hello', 'action': 'present', 'room': room }));
 	};
 
 	socket.onmessage = function(event) {

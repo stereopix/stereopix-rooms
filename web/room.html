@@ -42,7 +42,7 @@ function connect(room) {
 		document.getElementById("room_name").innerText = room;
 		document.getElementById("connected").innerText = "Yes";
 		document.body.classList.remove('error');
-		socket.send(JSON.stringify({ 'type': 'connect', 'room': room }));
+		socket.send(JSON.stringify({ 'type': 'hello', 'action': 'attend', 'room': room }));
 	};
 
 	socket.onmessage = function(event) {

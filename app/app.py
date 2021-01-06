@@ -82,25 +82,28 @@ async def websocket_json_msg(ws, json):
     if not 'type' in json: await kick(ws)
     if 'role' in ws.userData: await ws.userData['role'](ws, json)
 
-    if json['type'] == 'connect':
+    if json['type'] == 'hello':
+        if not 'action' in json: kick(ws)
         if not 'room' in json: kick(ws)
         r = json['room']
-        if not r in rooms or not rooms[r].is_opened:
-            await send(ws, { 'type': 'room_currently_closed' })
-            await ws.close()
+        if json['action'] == 'attend':
+            if not r in rooms or not rooms[r].is_opened:
+                await send(ws, { 'type': 'room_currently_closed' })
+                await ws.close()
+            else:
+                await rooms[r].join(ws)
+                ws.userData['role'] = client_msg
+                ws.userData['room'] = rooms[r]
+        elif json['action'] == 'present':
+            if r in rooms:
+                await send(ws, { 'type': 'room_already_opened' })
+                await ws.close()
+            else:
+                rooms[r] = Room(r, ws)
+                ws.userData['role'] = presenter_msg
+                ws.userData['room'] = rooms[r]
         else:
-            await rooms[r].join(ws)
-            ws.userData['role'] = client_msg
-            ws.userData['room'] = rooms[r]
-
-    elif json['type'] == 'init_room':
-        if not 'room' in json: kick(ws)
-        r = json['room']
-        if r in rooms:
-            await send(ws, { 'type': 'room_already_opened' })
-            await ws.close()
-        else:
-            rooms[r] = Room(r, ws)
-            ws.userData['role'] = presenter_msg
-            ws.userData['room'] = rooms[r]
+            kick(ws)
+    else:
+        kick(ws)
 
