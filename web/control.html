@@ -28,7 +28,7 @@ function connect(room) {
 		j = JSON.parse(event.data);
 
 		if (j.type == 'room_already_opened') {
-			document.getElementById('error_log').innerText = "This room is already opened."
+			document.getElementById('error_log').innerText = "This room is already controlled."
 
 		} else if (j.type == 'nb_connected') {
 			document.getElementById("connected_clients").innerText = j.nb;
