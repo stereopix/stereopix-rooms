@@ -1,0 +1,21 @@
+body {
+	padding: 10px;
+	text-align: center;
+	background-color: #f0f0f0;
+	color: #333;
+	font-family: "Noto Sans", sans-serif;
+}
+body.error {
+	background-color: #f0d4d4;
+}
+h1, h2, h3, h4 {
+	color: #990099;
+}
+a {
+	text-decoration: none;
+	color: #969;
+}
+#error_log {
+	font-weight: bold;
+	color: #f00000;
+}

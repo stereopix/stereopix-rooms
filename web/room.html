@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<link rel="icon" href="data:,">
+		<link rel="stylesheet" href="/style.css"/>
+		<title>Stereopix ROOMS</title>
+	</head>
+	<body class="centered">
+		<h1>Stereopix ROOMS</h1>
+		<script>
+function connect(room) {
+	let socket = new WebSocket("ws" + (document.location.protocol == "https:" ? "s" : "") + "://" + document.location.host + "/ws");
+	socket.onopen = function(e) {
+		console.log("[open] Connection established");
+		document.getElementById("room_name").innerText = room;
+		document.getElementById("connected").innerText = "Yes";
+		document.body.classList.remove('error');
+		socket.send(JSON.stringify({ 'type': 'connect', 'room': room }));
+	};
+
+	socket.onmessage = function(event) {
+		console.log(`[message] Data received from server: ${event.data}`);
+		j = JSON.parse(event.data);
+
+		if (j.type == 'room_currently_closed') {
+			document.getElementById('error_log').innerText = "This room is not currently opened, please come back later."
+		}
+	};
+
+	socket.onclose = function(event) {
+		if (event.wasClean) {
+			console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+		} else {
+			console.log('[close] Connection died');
+		}
+		document.getElementById("connected").innerText = "No";
+		document.body.classList.add('error');
+	};
+
+	socket.onerror = function(error) {
+		console.log(`[error] ${error.message}`);
+	};
+}
+
+window.addEventListener("DOMContentLoaded", (event) => {
+	room = false;
+	document.location.search.substring(1).split('&').forEach(kv => {
+		const [key, value] = kv.split('=');
+		if (key == "room")
+			room = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : false;
+	});
+	if (room)
+		connect(room);
+});
+		</script>
+		<p>Room name: <span id="room_name">Unknown</span></p>
+		<p>Connected: <span id="connected">No</span></p>
+		<p id="error_log"></p>
+	</body>
+</html>
