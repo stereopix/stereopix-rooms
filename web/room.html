@@ -12,7 +12,7 @@
 		<script>
 let viewer = null;
 let init_json = null;
-let init_position = null;
+let current_page = 0;
 
 window.addEventListener('message', function(e) {
 	if (e.origin == 'https://stereopix.net') {
@@ -22,17 +22,15 @@ window.addEventListener('message', function(e) {
 				viewer.postMessage({'stereopix_action': 'list_add_json', 'media': init_json}, 'https://stereopix.net');
 				init_json = null;
 			}
-			if (init_position) {
-				viewer.postMessage({'stereopix_action': 'goto', 'position': init_position}, 'https://stereopix.net');
-				init_position = null;
-			}
+			if (current_page)
+				viewer.postMessage({'stereopix_action': 'goto', 'position': current_page}, 'https://stereopix.net');
 		}
 	}
 });
 
 function change_page(page) {
 	if (viewer) viewer.postMessage({'stereopix_action': 'goto', 'position': page}, 'https://stereopix.net');
-	else init_position = page;
+	current_page = page;
 }
 
 function connect(room) {
@@ -89,12 +87,16 @@ window.addEventListener("DOMContentLoaded", (event) => {
 		if (key == "room")
 			room = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : false;
 	});
+	document.getElementById("btn_sync").addEventListener('click', e => {
+		if (viewer) viewer.postMessage({'stereopix_action': 'goto', 'position': current_page}, 'https://stereopix.net');
+	});
 	if (room)
 		connect(room);
 });
 		</script>
 		<p>Room name: <span id="room_name">Unknown</span></p>
 		<p>Connected: <span id="connected">No</span></p>
+		<p><input type="button" id="btn_sync" value="Go to current image" /></p>
 		<p id="error_log"></p>
 		<iframe title="Stereoscopic (3D) photo viewer" id="stereopix_viewer"
 			style="width: 100%; height: 960px; max-height: 100vh; max-width: 100vw; border: 2px solid black; margin: 8px 0;" 
