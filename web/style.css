@@ -1,7 +1,7 @@
 body {
-	padding: 10px;
+	padding: 130px 10px 10px 10px;
 	text-align: center;
-	background-color: #f0f0f0;
+	background: #f0f0f0 url('logo.webp') no-repeat top center;
 	color: #333;
 	font-family: "Noto Sans", sans-serif;
 }
