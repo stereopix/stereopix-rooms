@@ -17,7 +17,7 @@ async def http_root_handler(request):
 
 async def websocket_handler(request): 
     if allowed_origin_hosts and request.headers.get(hdrs.ORIGIN) not in allowed_origin_hosts:
-        raise HTTPForbidden()
+        raise web.HTTPForbidden()
 
     ws = web.WebSocketResponse()
     ws.userData = {}
