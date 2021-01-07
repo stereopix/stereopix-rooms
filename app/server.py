@@ -7,7 +7,7 @@ import aiohttp
 from aiohttp import web, hdrs
 import asyncio
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
-from app import websocket_json_msg
+from app import websocket_json_msg, Kick
 
 allowed_origin_hosts = None
 
@@ -31,11 +31,12 @@ async def websocket_handler(request):
                 try:
                     j = json.loads(msg.data)
                     await websocket_json_msg(ws, j)
-                except json.decoder.JSONDecodeError:
-                    msg = {'type': 'kick' }
-                    await ws.send_str(json.dumps(msg))
-                    print('>', msg)
-                    await ws.close()
+                except (json.decoder.JSONDecodeError, Kick):
+                    if not ws.closed:
+                        msg = {'type': 'kick' }
+                        print('>', msg)
+                        await ws.send_str(json.dumps(msg))
+                        await ws.close()
         elif msg.type == aiohttp.WSMsgType.ERROR:
             print('ws connection closed with exception %s' % ws.exception())
 

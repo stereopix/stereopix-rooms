@@ -9,9 +9,8 @@ async def send(ws, obj):
         print('>', obj)
         await ws.send_str(json.dumps(obj))
 
-async def kick(ws):
-    await send(ws, {'type': 'kick' })
-    await ws.close()
+class Kick(BaseException):
+    pass
 
 class Room:
     def __init__(self, name, ws):
@@ -59,15 +58,15 @@ async def presenter_msg(ws, json):
         rooms.pop(room.name, None)
 
     elif json['type'] == 'open_room':
-        if not 'json' in json: kick(ws)
+        if not 'json' in json: raise Kick()
         await room.open(json['json'])
 
     elif json['type'] == 'change_page':
-        if not 'page' in json: kick(ws)
+        if not 'page' in json: raise Kick()
         await room.change_page(json['page'])
 
     else:
-        kick(ws)
+        raise Kick()
 
 async def client_msg(ws, json):
     room = ws.userData['room']
@@ -75,16 +74,17 @@ async def client_msg(ws, json):
         await room.quit(ws)
 
     else:
-        kick(ws)
+        raise Kick()
 
 async def websocket_json_msg(ws, json):
     print('<', json)
-    if not 'type' in json: await kick(ws)
-    if 'role' in ws.userData: await ws.userData['role'](ws, json)
+    if not 'type' in json: raise Kick()
+    if 'role' in ws.userData:
+        await ws.userData['role'](ws, json)
 
-    if json['type'] == 'hello':
-        if not 'action' in json: kick(ws)
-        if not 'room' in json: kick(ws)
+    elif json['type'] == 'hello':
+        if not 'action' in json: raise Kick()
+        if not 'room' in json: raise Kick()
         r = json['room']
         if json['action'] == 'attend':
             if not r in rooms or not rooms[r].is_opened:
@@ -103,7 +103,7 @@ async def websocket_json_msg(ws, json):
                 ws.userData['role'] = presenter_msg
                 ws.userData['room'] = rooms[r]
         else:
-            kick(ws)
+            raise Kick()
     else:
-        kick(ws)
+        raise Kick()
 
