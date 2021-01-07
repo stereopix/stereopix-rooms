@@ -3,6 +3,11 @@ Stereopix ROOMS
 
 Application to allow people to look at stereoscopic images synchronously with the viewer of https://stereopix.net/
 
+Demo
+----
+
+A live demo is hosted by repl.it: https://rooms.stereopix.repl.co/
+
 Development
 -----------
 
