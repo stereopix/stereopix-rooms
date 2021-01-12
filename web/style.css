@@ -41,3 +41,22 @@ body.error .hide_on_error, body.error #stereopix_viewer {
 #page {
 	width: 90%;
 }
+.box {
+	display: inline-block;
+	background: #fff;
+	border-radius: 15px;
+	padding: 10px;
+	margin: 10px;
+}
+#join_box {
+	width: 400px;
+	margin: 40px auto;
+}
+#join_box input[type=text] {
+	width: 80%;
+}
+#intro {
+	display: block;
+	max-width: 800px;
+	margin: 20px auto;
+}
