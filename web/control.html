@@ -52,6 +52,7 @@ function connect(room) {
 		document.getElementById("connected_clients").innerText = "0";
 		document.body.classList.add('error');
 		document.getElementById('presenter_block').style.display = 'none';
+		socket = false;
 	};
 
 	socket.onerror = function(error) {
@@ -93,6 +94,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
 		connect(room);
 });
 window.addEventListener("beforeunload", e => {
+	if (!socket) return;
 	const msg = "By closing this page, you will close the room";
 	e.returnValue = msg;
 	return msg;
