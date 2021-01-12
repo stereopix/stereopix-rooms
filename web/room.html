@@ -97,8 +97,8 @@ window.addEventListener("DOMContentLoaded", (event) => {
 		</script>
 		<p>Room name: <span id="room_name">Unknown</span></p>
 		<p>Connected: <span id="connected">No</span></p>
-		<p><label><input type="checkbox" id="chk_follow" checked /> Change image with the presenter</label></p>
-		<p><input type="button" id="btn_sync" value="Go to current image" /></p>
+		<p class="hide_on_error"><label><input type="checkbox" id="chk_follow" checked /> Change image with the presenter</label></p>
+		<p class="hide_on_error"><input type="button" id="btn_sync" value="Go to current image" /></p>
 		<p id="error_log"></p>
 		<iframe title="Stereoscopic (3D) photo viewer" id="stereopix_viewer"
 			style="width: 100%; height: 960px; max-height: 100vh; max-width: 100vw; border: 2px solid black; margin: 8px 0;" 

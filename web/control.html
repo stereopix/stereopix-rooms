@@ -100,9 +100,9 @@ window.addEventListener("beforeunload", e => {
 		</script>
 		<p>Room name: <span id="room_name">Unknown</span></p>
 		<p>Connected: <span id="connected">No</span></p>
-		<p>Connected clents: <span id="connected_clients">0</span></p>
+		<p class="hide_on_error">Connected clents: <span id="connected_clients">0</span></p>
 		<p id="error_log"></p>
-		<div id="presenter_block">
+		<div id="presenter_block" class="hide_on_error">
 		<p><label><input type="checkbox" id="allow_stealing" />Allow stealing of the room</label></p>
 		<h2>JSON</h2>
 		<form id="json_form">

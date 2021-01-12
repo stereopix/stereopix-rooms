@@ -31,7 +31,7 @@ a {
 	color: #636;
 	text-decoration: underline;
 }
-body.error #presenter_block {
+body.error .hide_on_error, body.error #stereopix_viewer {
 	display: none;
 }
 #json_code {
