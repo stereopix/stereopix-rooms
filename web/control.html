@@ -7,7 +7,7 @@
 		<title>Stereopix ROOMS</title>
 	</head>
 	<body class="centered">
-		<h1 style="display: none">Stereopix ROOMS</h1>
+		<h1>Stereopix ROOMS</h1>
 		<p class="subtitle"><a href="/">ROOMS</a> uses the viewer of <a href="https://stereopix.net/">Stereopix</a> to create interactive rooms.</p>
 		<script>
 let socket = false;
@@ -19,7 +19,6 @@ function connect(room) {
 		document.getElementById("connected").innerText = "Yes";
 		document.getElementById("connected_clients").innerText = "0";
 		document.body.classList.remove('error');
-		document.getElementById('presenter_block').style.display = 'block';
 		socket.send(JSON.stringify({ 'type': 'hello', 'action': 'present', 'room': room }));
 	};
 
@@ -51,7 +50,6 @@ function connect(room) {
 		document.getElementById("connected").innerText = "No";
 		document.getElementById("connected_clients").innerText = "0";
 		document.body.classList.add('error');
-		document.getElementById('presenter_block').style.display = 'none';
 		socket = false;
 	};
 
@@ -104,18 +102,18 @@ window.addEventListener("beforeunload", e => {
 		<p>Connected: <span id="connected">No</span></p>
 		<p>Connected clents: <span id="connected_clients">0</span></p>
 		<p id="error_log"></p>
-		<div id="presenter_block" style="display:none">
+		<div id="presenter_block">
 		<p><label><input type="checkbox" id="allow_stealing" />Allow stealing of the room</label></p>
 		<h2>JSON</h2>
 		<form id="json_form">
-			<textarea id="json_code" style="width: 90%; min-height: 200px"></textarea>
+			<textarea id="json_code"></textarea>
 			<br />
 			<input type="submit" />
 		</form>
 
 		<h2>Page number</h2>
 		<form id="page_form">
-			<input type="number" value="0" id="page" style="width: 90%;" />
+			<input type="number" value="0" id="page" />
 			<br />
 			<input type="submit" />
 		</form>
