@@ -11,10 +11,11 @@ sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 from app import websocket_json_msg, Kick
 
 allowed_origin_hosts = None
+stylestamp = str(int(os.path.getmtime('web/style.css')))
 
 async def http_root_handler(request):
     with open('web/index.html') as f:
-        return web.Response(text=f.read(), content_type='text/html')
+        return web.Response(text=f.read().replace('{{STYLESTAMP}}', stylestamp), content_type='text/html')
 
 async def http_redirect_home(request):
     raise web.HTTPFound(location='/')
@@ -24,10 +25,10 @@ async def http_app_handler(request):
     if not 'room' in data: raise web.HTTPFound(location='/')
     if 'presenter' in data:
         with open('web/control.html') as f:
-            return web.Response(text=f.read().replace('{{ROOM}}', quote(data['room'])), content_type='text/html')
+            return web.Response(text=f.read().replace('{{ROOM}}', quote(data['room'])).replace('{{STYLESTAMP}}', stylestamp), content_type='text/html')
     else:
         with open('web/room.html') as f:
-            return web.Response(text=f.read().replace('{{ROOM}}', quote(data['room'])), content_type='text/html')
+            return web.Response(text=f.read().replace('{{ROOM}}', quote(data['room'])).replace('{{STYLESTAMP}}', stylestamp), content_type='text/html')
 
 async def websocket_handler(request): 
     if allowed_origin_hosts and request.headers.get(hdrs.ORIGIN) not in allowed_origin_hosts:
