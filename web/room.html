@@ -10,6 +10,7 @@
 		<h1>Stereopix ROOMS</h1>
 		<p class="subtitle"><a href="/">ROOMS</a> uses the viewer of <a href="https://stereopix.net/">Stereopix</a> to create interactive rooms.</p>
 		<script>
+let room = decodeURIComponent("{{ROOM}}");
 let viewer = null;
 let init_json = null;
 let current_page = 0;
@@ -85,17 +86,10 @@ function connect(room) {
 }
 
 window.addEventListener("DOMContentLoaded", (event) => {
-	room = false;
-	document.location.search.substring(1).split('&').forEach(kv => {
-		const [key, value] = kv.split('=');
-		if (key == "room")
-			room = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : false;
-	});
 	document.getElementById("btn_sync").addEventListener('click', e => {
 		if (viewer) viewer.postMessage({'stereopix_action': 'goto', 'position': current_page}, 'https://stereopix.net');
 	});
-	if (room)
-		connect(room);
+	connect(room);
 });
 		</script>
 		<p>Room name: <span id="room_name">Unknown</span></p>

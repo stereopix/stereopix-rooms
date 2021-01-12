@@ -14,13 +14,10 @@
 		It is powered by this <a href="https://github.com/stereopix-viewer-examples/stereopix-rooms">code</a> under free license. Have fun.</p>
 
 		<h2>Join a room</h2>
-		<form method="GET" action="room.html">
-			<p><input type="text" name="room" placeholder="Room name" /><input type="submit" /></p>
-		</form>
-
-		<h2>Create a room</h2>
-		<form method="GET" action="control.html">
-			<p><input type="text" name="room" placeholder="Room name" /><input type="submit" /></p>
+		<form method="POST" action="/">
+			<p><input type="text" name="room" placeholder="Room name" spellcheck="false" minlength="3" maxlength="50" required /></p>
+			<p><label><input type="checkbox" name="presenter" /> I am the presenter</p>
+			<p><input type="submit" value="Enter the room" /></p>
 		</form>
 	</body>
 </html>

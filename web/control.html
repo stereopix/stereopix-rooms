@@ -11,6 +11,7 @@
 		<p class="subtitle"><a href="/">ROOMS</a> uses the viewer of <a href="https://stereopix.net/">Stereopix</a> to create interactive rooms.</p>
 		<script>
 let socket = false;
+let room = decodeURIComponent("{{ROOM}}");
 function connect(room) {
 	socket = new WebSocket("ws" + (document.location.protocol == "https:" ? "s" : "") + "://" + document.location.host + "/ws");
 	socket.onopen = function(e) {
@@ -59,12 +60,6 @@ function connect(room) {
 }
 
 window.addEventListener("DOMContentLoaded", (event) => {
-	room = false;
-	document.location.search.substring(1).split('&').forEach(kv => {
-		const [key, value] = kv.split('=');
-		if (key == "room")
-			room = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : false;
-	});
 	document.getElementById("allow_stealing").checked = false;
 	document.getElementById("allow_stealing").addEventListener("change", e => {
 		if (socket)
@@ -88,8 +83,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
 		if (socket)
 			socket.send(JSON.stringify({ 'type': 'change_page', 'page': document.getElementById("page").value }));
 	});
-	if (room)
-		connect(room);
+	connect(room);
 });
 window.addEventListener("beforeunload", e => {
 	if (!socket) return;
