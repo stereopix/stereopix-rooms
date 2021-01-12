@@ -18,6 +18,7 @@ class Room:
         self.clients = set()
         self.presenter = ws
         self.is_opened = False
+        self.allow_stealing = False
         self.json = '{}'
         self.page = 0
 
@@ -40,6 +41,15 @@ class Room:
         self.clients.discard(w)
         await send(self.presenter, { 'type': 'nb_connected', 'nb': len(self.clients) })
 
+    async def steal(self, ws):
+        self.allow_stealing = False
+        await send(self.presenter, { 'type': 'room_stolen_kick' })
+        self.presenter.userData.pop('room', None)
+        self.presenter.userData.pop('role', None)
+        await self.presenter.close()
+        self.presenter = ws
+        await send(self.presenter, { 'type': 'room_stolen', 'json': self.json, 'page': self.page })
+
     async def open(self, j):
         self.is_opened = True
         self.json = j
@@ -60,6 +70,10 @@ async def presenter_msg(ws, json):
     elif json['type'] == 'open_room':
         if not 'json' in json: raise Kick()
         await room.open(json['json'])
+
+    elif json['type'] == 'allow_stealing':
+        if not 'value' in json: raise Kick()
+        room.allow_stealing = json['value']
 
     elif json['type'] == 'change_page':
         if not 'page' in json: raise Kick()
@@ -96,8 +110,13 @@ async def websocket_json_msg(ws, json):
                 ws.userData['room'] = rooms[r]
         elif json['action'] == 'present':
             if r in rooms:
-                await send(ws, { 'type': 'room_already_opened' })
-                await ws.close()
+                if rooms[r].allow_stealing:
+                    ws.userData['role'] = presenter_msg
+                    ws.userData['room'] = rooms[r]
+                    await rooms[r].steal(ws)
+                else:
+                    await send(ws, { 'type': 'room_already_opened' })
+                    await ws.close()
             else:
                 rooms[r] = Room(r, ws)
                 ws.userData['role'] = presenter_msg

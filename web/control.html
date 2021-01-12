@@ -30,6 +30,13 @@ function connect(room) {
 		if (j.type == 'room_already_opened') {
 			document.getElementById('error_log').innerText = "This room is already controlled."
 
+		} else if (j.type == 'room_stolen_kick') {
+			document.getElementById('error_log').innerText = "This room was stolen."
+
+		} else if (j.type == 'room_stolen') {
+			document.getElementById("json_code").value = j.json;
+			document.getElementById("page").value = j.page;
+
 		} else if (j.type == 'nb_connected') {
 			document.getElementById("connected_clients").innerText = j.nb;
 		}
@@ -58,6 +65,11 @@ window.addEventListener("DOMContentLoaded", (event) => {
 		const [key, value] = kv.split('=');
 		if (key == "room")
 			room = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : false;
+	});
+	document.getElementById("allow_stealing").checked = false;
+	document.getElementById("allow_stealing").addEventListener("change", e => {
+		if (socket)
+			socket.send(JSON.stringify({ 'type': 'allow_stealing', 'value': e.target.checked }));
 	});
 	document.getElementById("json_form").addEventListener("submit", e => {
 		e.preventDefault();
@@ -91,6 +103,7 @@ window.addEventListener("beforeunload", e => {
 		<p>Connected clents: <span id="connected_clients">0</span></p>
 		<p id="error_log"></p>
 		<div id="presenter_block" style="display:none">
+		<p><label><input type="checkbox" id="allow_stealing" />Allow stealing of the room</label></p>
 		<h2>JSON</h2>
 		<form id="json_form">
 			<textarea id="json_code" style="width: 90%; min-height: 200px"></textarea>
