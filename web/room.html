@@ -61,6 +61,9 @@ function connect(room) {
 			}
 			change_page(j.page);
 
+		} else if (j.type == 'room_closed') {
+			document.getElementById('error_log').innerText = "This room closed."
+
 		} else if (j.type == 'page_changed') {
 			change_page(j.page);
 		}
