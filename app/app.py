@@ -62,6 +62,8 @@ class Room:
         clients = self.clients.copy()
         for w in clients:
             await send(w, { 'type': 'room_closed' })
+            w.userData.pop('room', None)
+            w.userData.pop('role', None)
             await w.close()
 
 async def presenter_msg(ws, json):
