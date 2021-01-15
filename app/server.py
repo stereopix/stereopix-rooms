@@ -2,6 +2,7 @@
 
 import sys
 import os
+import time
 import json
 import aiohttp
 from aiohttp import web, hdrs
@@ -34,11 +35,32 @@ async def websocket_handler(request):
     if allowed_origin_hosts and request.headers.get(hdrs.ORIGIN) not in allowed_origin_hosts:
         raise web.HTTPForbidden()
 
-    ws = web.WebSocketResponse()
+    ws = web.WebSocketResponse(autoping=False)
     ws.userData = {}
     await ws.prepare(request)
 
+    async def heatbeat():
+        async def heatbeat_ping():
+            try:
+                await ws.ping()
+            except ConnectionResetError:
+                await websocket_json_msg(ws, { 'type': 'connection_closed', 'cause': 'heatbeat_ping' })
+
+        while True:
+            await asyncio.sleep(10)
+            if ws.closed: return
+            dt = time.time() - ws.userData['lastmsg']
+            if dt > 39:
+                ws.force_close()
+                await websocket_json_msg(ws, { 'type': 'connection_closed', 'cause': 'heatbeat_no_pong' })
+                return
+            elif dt > 19:
+                asyncio.create_task(heatbeat_ping())
+
+    asyncio.create_task(heatbeat())
+
     async for msg in ws:
+        ws.userData['lastmsg'] = time.time()
         if msg.type == aiohttp.WSMsgType.TEXT:
             if msg.data == 'bye':
                 await ws.close()
@@ -52,10 +74,14 @@ async def websocket_handler(request):
                         print('>', msg)
                         await ws.send_str(json.dumps(msg))
                         await ws.close()
+
         elif msg.type == aiohttp.WSMsgType.ERROR:
             print('ws connection closed with exception %s' % ws.exception())
 
-    await websocket_json_msg(ws, { 'type': 'connection_closed' })
+        elif msg.type == aiohttp.WSMsgType.PING:
+            await ws.pong(msg.data)
+
+    await websocket_json_msg(ws, { 'type': 'connection_closed', 'cause': 'end_of_messages' })
     return ws
 
 async def start_server(host, port):
