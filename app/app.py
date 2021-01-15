@@ -7,7 +7,10 @@ rooms = {}
 async def send(ws, obj):
     if not ws.closed:
         print('>', obj)
-        await ws.send_str(json.dumps(obj))
+        try:
+            await ws.send_str(json.dumps(obj))
+        except ConnectionResetError:
+            print('> ERROR')
 
 class Kick(BaseException):
     pass
