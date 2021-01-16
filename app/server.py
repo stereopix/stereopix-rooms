@@ -21,9 +21,6 @@ async def http_root_handler(request):
 async def http_room_handler(request):
     return await app_handler(request.match_info)
 
-async def http_redirect_home(request):
-    raise web.HTTPFound(location='/')
-
 async def http_app_handler(request):
     data = await request.post()
     return await app_handler(data)
@@ -101,9 +98,6 @@ async def start_server(host, port):
         web.get('/ws', websocket_handler),
         web.get('/', http_root_handler),
         web.post('/', http_app_handler),
-        web.get('/index.html', http_redirect_home),
-        web.get('/room.html', http_redirect_home),
-        web.get('/control.html', http_redirect_home),
         web.get('/{room}', http_room_handler),
         web.get('/{room}/', http_room_handler),
         web.static('/', 'web'),
