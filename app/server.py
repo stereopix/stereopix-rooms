@@ -18,11 +18,17 @@ async def http_root_handler(request):
     with open('web/templates/index.html') as f:
         return web.Response(text=f.read().replace('{{STYLESTAMP}}', stylestamp), content_type='text/html')
 
+async def http_room_handler(request):
+    return await app_handler(request.match_info)
+
 async def http_redirect_home(request):
     raise web.HTTPFound(location='/')
 
 async def http_app_handler(request):
     data = await request.post()
+    return await app_handler(data)
+
+async def app_handler(data):
     if not 'room' in data: raise web.HTTPFound(location='/')
     if 'presenter' in data:
         with open('web/templates/control.html') as f:
@@ -98,6 +104,8 @@ async def start_server(host, port):
         web.get('/index.html', http_redirect_home),
         web.get('/room.html', http_redirect_home),
         web.get('/control.html', http_redirect_home),
+        web.get('/{room}', http_room_handler),
+        web.get('/{room}/', http_room_handler),
         web.static('/', 'web'),
         ])
     runner = web.AppRunner(app)
