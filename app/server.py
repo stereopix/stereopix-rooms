@@ -12,10 +12,10 @@ sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 from app import websocket_json_msg, Kick
 
 allowed_origin_hosts = None
-stylestamp = str(int(os.path.getmtime('web/style.css')))
+stylestamp = str(int(os.path.getmtime('web/design/style.css')))
 
 async def http_root_handler(request):
-    with open('web/index.html') as f:
+    with open('web/templates/index.html') as f:
         return web.Response(text=f.read().replace('{{STYLESTAMP}}', stylestamp), content_type='text/html')
 
 async def http_redirect_home(request):
@@ -25,10 +25,10 @@ async def http_app_handler(request):
     data = await request.post()
     if not 'room' in data: raise web.HTTPFound(location='/')
     if 'presenter' in data:
-        with open('web/control.html') as f:
+        with open('web/templates/control.html') as f:
             return web.Response(text=f.read().replace('{{ROOM}}', quote(data['room'])).replace('{{STYLESTAMP}}', stylestamp), content_type='text/html')
     else:
-        with open('web/room.html') as f:
+        with open('web/templates/room.html') as f:
             return web.Response(text=f.read().replace('{{ROOM}}', quote(data['room'])).replace('{{STYLESTAMP}}', stylestamp), content_type='text/html')
 
 async def websocket_handler(request): 
