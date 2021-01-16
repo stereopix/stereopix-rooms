@@ -44,14 +44,16 @@ async def websocket_handler(request):
             try:
                 await ws.ping()
             except ConnectionResetError:
+                ws.userData['lastmsg'] = -1
                 await websocket_json_msg(ws, { 'type': 'connection_closed', 'cause': 'heatbeat_ping' })
 
         while True:
             await asyncio.sleep(10)
-            if ws.closed: return
+            if ws.closed or ws.userData['lastmsg'] < 0: return
             dt = time.time() - ws.userData['lastmsg']
             if dt > 39:
                 ws.force_close()
+                ws.userData['lastmsg'] = -1
                 await websocket_json_msg(ws, { 'type': 'connection_closed', 'cause': 'heatbeat_no_pong' })
                 return
             elif dt > 19:
@@ -81,7 +83,10 @@ async def websocket_handler(request):
         elif msg.type == aiohttp.WSMsgType.PING:
             await ws.pong(msg.data)
 
-    await websocket_json_msg(ws, { 'type': 'connection_closed', 'cause': 'end_of_messages' })
+    if not ws.userData['lastmsg'] < 0:
+        ws.userData['lastmsg'] = -1
+        await websocket_json_msg(ws, { 'type': 'connection_closed', 'cause': 'end_of_messages' })
+
     return ws
 
 async def start_server(host, port):
