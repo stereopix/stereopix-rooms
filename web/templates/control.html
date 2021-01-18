@@ -91,6 +91,10 @@ window.addEventListener("beforeunload", e => {
 	e.returnValue = msg;
 	return msg;
 });
+window.addEventListener("pagehide", (event) => {
+	if (socket)
+		socket.close();
+});
 		</script>
 		<p>Room name: <span id="room_name">Unknown</span></p>
 		<p>Connected: <span id="connected">No</span></p>
