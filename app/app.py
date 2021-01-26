@@ -66,6 +66,9 @@ class Room:
             w.userData.pop('role', None)
             await w.close()
 
+def is_opened(r):
+    return r in rooms and rooms[r].is_opened
+
 async def presenter_msg(ws, json):
     room = ws.userData['room']
     if json['type'] == 'connection_closed':
@@ -106,7 +109,7 @@ async def websocket_json_msg(ws, json):
         if not 'room' in json: raise Kick()
         r = json['room']
         if json['action'] == 'attend':
-            if not r in rooms or not rooms[r].is_opened:
+            if not is_opened(r):
                 await send(ws, { 'type': 'room_currently_closed' })
                 await ws.close()
             else:
