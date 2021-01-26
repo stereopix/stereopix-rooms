@@ -14,9 +14,17 @@ from app import websocket_json_msg, Kick
 allowed_origin_hosts = None
 stylestamp = str(int(os.path.getmtime('web/design/style.css')))
 
+async def simple_template(filename, d=None):
+    repl = {'STYLESTAMP': stylestamp, 'ROOM': ''}
+    if d: repl.update(d)
+    with open('web/templates/' + filename + '.html', 'r') as f:
+        txt = f.read()
+        for k, v in repl.items():
+            txt = txt.replace('{{'+k+'}}', v)
+        return web.Response(text=txt, content_type='text/html')
+
 async def http_root_handler(request):
-    with open('web/templates/index.html') as f:
-        return web.Response(text=f.read().replace('{{STYLESTAMP}}', stylestamp), content_type='text/html')
+    return await simple_template('index')
 
 async def http_room_handler(request):
     return await app_handler(request.match_info)
@@ -28,11 +36,9 @@ async def http_app_handler(request):
 async def app_handler(data):
     if not 'room' in data: raise web.HTTPFound(location='/')
     if 'presenter' in data:
-        with open('web/templates/control.html') as f:
-            return web.Response(text=f.read().replace('{{ROOM}}', quote(data['room'])).replace('{{STYLESTAMP}}', stylestamp), content_type='text/html')
+        return await simple_template('control', {'ROOM': quote(data['room'])})
     else:
-        with open('web/templates/room.html') as f:
-            return web.Response(text=f.read().replace('{{ROOM}}', quote(data['room'])).replace('{{STYLESTAMP}}', stylestamp), content_type='text/html')
+        return await simple_template('room', {'ROOM': quote(data['room'])})
 
 async def websocket_handler(request): 
     if allowed_origin_hosts and request.headers.get(hdrs.ORIGIN) not in allowed_origin_hosts:
