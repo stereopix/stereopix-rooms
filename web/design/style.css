@@ -54,6 +54,7 @@ body.error .hide_on_error, body.error #stereopix_viewer {
 }
 #join_box input[type=text] {
 	width: 80%;
+	text-align: center;
 }
 #intro {
 	display: block;
