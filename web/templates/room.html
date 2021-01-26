@@ -83,6 +83,11 @@ function connect(room) {
 	socket.onerror = function(error) {
 		console.log(`[error] ${error.message}`);
 	};
+
+	window.addEventListener("pagehide", (event) => {
+		if (socket)
+			socket.close();
+	});
 }
 
 window.addEventListener("DOMContentLoaded", (event) => {
@@ -90,10 +95,6 @@ window.addEventListener("DOMContentLoaded", (event) => {
 		if (viewer) viewer.postMessage({'stereopix_action': 'goto', 'position': current_page}, 'https://stereopix.net');
 	});
 	connect(room);
-});
-window.addEventListener("pagehide", (event) => {
-	if (socket)
-		socket.close();
 });
 		</script>
 		<p>Room name: <span id="room_name">Unknown</span></p>
