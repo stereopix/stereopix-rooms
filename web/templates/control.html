@@ -67,16 +67,34 @@ window.addEventListener("DOMContentLoaded", (event) => {
 	});
 	document.getElementById("json_form").addEventListener("submit", e => {
 		e.preventDefault();
+		const code = document.getElementById("json_code");
 		let j = null;
-		try {
-			JSON.parse(document.getElementById("json_code").value);
-			j = document.getElementById("json_code").value;
-		} catch(e) {
-			alert("Invalid JSON syntax");
-			console.warn(e);
+		function send_code() {
+			try {
+				JSON.parse(code.value);
+				j = code.value;
+			} catch(e) {
+				alert("Invalid JSON syntax");
+				console.warn(e);
+			}
+			if (socket && j)
+				socket.send(JSON.stringify({ 'type': 'open_room', 'json': j }));
 		}
-		if (socket && j)
-			socket.send(JSON.stringify({ 'type': 'open_room', 'json': j }));
+		if (code.value.trim().startsWith("https://")) {
+			const xhr = new XMLHttpRequest();
+			xhr.onload = function(e) {
+				code.value = this.responseText;
+				send_code();
+			};
+			xhr.onerror = function(e) {
+				code.value = "Error while loading the JSON file."
+			};
+			xhr.open("GET", code.value.trim(), true);
+			xhr.send();
+			code.value = "Loading JSON...";
+		} else {
+			send_code();
+		}
 	});
 	document.getElementById("page_form").addEventListener("submit", e => {
 		e.preventDefault();
