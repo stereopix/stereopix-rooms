@@ -6,7 +6,7 @@ import time
 import json
 import aiohttp
 from aiohttp import web, hdrs
-from urllib.parse import quote
+from urllib.parse import quote, quote_plus, unquote_plus
 import asyncio
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 from app import websocket_json_msg, is_opened, Kick
@@ -27,12 +27,15 @@ async def http_root_handler(request):
     return await simple_template('index')
 
 async def http_room_handler(request):
+    request.match_info['room'] = unquote_plus(request.match_info['room'])
     if is_opened(request.match_info['room']):
         return await app_handler(request.match_info)
     return await simple_template('closed_room', {'ROOM': quote(request.match_info['room'])})
 
 async def http_app_handler(request):
     data = await request.post()
+    if 'room' in data and not 'presenter' in data:
+        raise web.HTTPFound(location='/'+quote_plus(data['room']))
     return await app_handler(data)
 
 async def app_handler(data):
