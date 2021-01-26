@@ -9,7 +9,7 @@ from aiohttp import web, hdrs
 from urllib.parse import quote
 import asyncio
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
-from app import websocket_json_msg, Kick
+from app import websocket_json_msg, is_opened, Kick
 
 allowed_origin_hosts = None
 stylestamp = str(int(os.path.getmtime('web/design/style.css')))
@@ -27,7 +27,9 @@ async def http_root_handler(request):
     return await simple_template('index')
 
 async def http_room_handler(request):
-    return await app_handler(request.match_info)
+    if is_opened(request.match_info['room']):
+        return await app_handler(request.match_info)
+    return await simple_template('closed_room', {'ROOM': quote(request.match_info['room'])})
 
 async def http_app_handler(request):
     data = await request.post()
