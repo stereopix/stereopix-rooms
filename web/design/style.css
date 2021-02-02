@@ -1,5 +1,13 @@
+* {
+	box-sizing: border-box;
+}
+html {
+	margin: 0;
+	padding: 0;
+}
 body {
-	padding: 130px 10px 10px 10px;
+	padding: 130px 0 10px 0;
+	margin: 0;
 	text-align: center;
 	background: #f0f0f0 url('logo.webp') no-repeat top center;
 	color: #333;
