@@ -12,6 +12,7 @@
 		<script>
 let socket = false;
 let room = decodeURIComponent("{{ROOM}}");
+let nb_connected = 0;
 function connect(room) {
 	socket = new WebSocket("ws" + (document.location.protocol == "https:" ? "s" : "") + "://" + document.location.host + "/ws");
 	socket.onopen = function(e) {
@@ -39,6 +40,7 @@ function connect(room) {
 
 		} else if (j.type == 'nb_connected') {
 			document.getElementById("connected_clients").innerText = j.nb;
+			nb_connected = j.nb;
 		}
 	};
 
@@ -104,7 +106,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
 	connect(room);
 });
 window.addEventListener("beforeunload", e => {
-	if (!socket) return;
+	if (!socket || nb_connected == 0) return;
 	const msg = "By closing this page, you will close the room";
 	e.returnValue = msg;
 	return msg;
