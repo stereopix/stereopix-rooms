@@ -40,6 +40,10 @@ async def http_room_page_handler(request):
     r = unquote_plus(request.match_info['room'])
     return web.Response(text=str(room_get_page(r)), content_type='text/plain')
 
+async def http_room_opened_handler(request):
+    r = unquote_plus(request.match_info['room'])
+    return web.Response(text=str(int(is_opened(r))), content_type='text/plain')
+
 async def http_app_handler(request):
     data = await request.post()
     if 'room' in data and not 'presenter' in data:
@@ -121,6 +125,7 @@ async def start_server(host, port):
         web.get('/{room}/', http_room_handler),
         web.get('/{room}/list.json', http_room_list_json_handler),
         web.get('/{room}/page.txt', http_room_page_handler),
+        web.get('/{room}/opened.txt', http_room_opened_handler),
         web.static('/', 'web'),
         ])
     runner = web.AppRunner(app)
