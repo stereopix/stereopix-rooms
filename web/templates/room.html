@@ -9,7 +9,7 @@
 	<body class="centered">
 		<h1>Stereopix ROOMS</h1>
 		<p class="subtitle"><a href="/">ROOMS</a> uses the viewer of <a href="https://stereopix.net/">Stereopix</a> to create interactive rooms.</p>
-		<script>
+		<script type="module">
 let room = decodeURIComponent("{{ROOM}}");
 let viewer = null;
 let init_json = null;
@@ -47,7 +47,7 @@ function connect(room) {
 
 	socket.onmessage = function(event) {
 		console.log(`[message] Data received from server: ${event.data}`);
-		j = JSON.parse(event.data);
+		const j = JSON.parse(event.data);
 
 		if (j.type == 'room_currently_closed') {
 			document.getElementById('error_log').innerText = "This room is not currently opened, please come back later."
@@ -97,9 +97,58 @@ window.addEventListener("DOMContentLoaded", (event) => {
 	connect(room);
 });
 		</script>
+		<script type="text/javascript" nomodule>
+var room = decodeURIComponent("{{ROOM}}");
+var init_json = null;
+var current_page = 0;
+var viewer = null;
+
+window.addEventListener('message', function(e) {
+	if (e.origin == 'https://stereopix.net') {
+		if (e.data.type == 'viewerReady') {
+			viewer = e.source;
+			if (init_json) {
+				viewer.postMessage({'stereopix_action': 'list_add_json', 'media': init_json}, 'https://stereopix.net');
+				init_json = null;
+			}
+			if (current_page)
+				viewer.postMessage({'stereopix_action': 'goto', 'position': current_page}, 'https://stereopix.net');
+		}
+	}
+});
+function update_page() {
+	var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+	xhr.open("GET", document.location.origin + "/{{ROOM}}/page.txt", true);
+	xhr.onreadystatechange = function() {
+		if(xhr.readyState == 4 && xhr.status == 200) {
+			document.getElementById("btn_sync").disabled = false;
+			current_page = Number(xhr.responseText);
+			if (viewer) viewer.postMessage({'stereopix_action': 'goto', 'position': current_page}, 'https://stereopix.net');
+		}
+	}
+	xhr.send("");
+	document.getElementById("btn_sync").disabled = true;
+}
+window.addEventListener("DOMContentLoaded", function(event) {
+	document.getElementById("btn_sync").addEventListener('click', update_page);
+	document.getElementById("room_name").innerText = room;
+	document.getElementById("chk_follow_parent").style.display = 'none';
+	document.getElementById("error_log").innerText = "Your browser does not support the 'live' messaging system. You can press the button labelled '" + document.getElementById("btn_sync").value + "' to sync manually.";
+	update_page();
+	var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+	xhr.open("GET", document.location.origin + "/{{ROOM}}/list.json", true);
+	xhr.onreadystatechange = function() {
+		if(xhr.readyState == 4 && xhr.status == 200) {
+			init_json = JSON.parse(xhr.responseText);
+			if (viewer) viewer.postMessage({'stereopix_action': 'list_add_json', 'media': init_json}, 'https://stereopix.net');
+		}
+	}
+	xhr.send("");
+});
+		</script>
 		<p>Room name: <span id="room_name">Unknown</span></p>
 		<p>Connected: <span id="connected">No</span></p>
-		<p class="hide_on_error"><label><input type="checkbox" id="chk_follow" checked /> Change image with the presenter</label></p>
+		<p class="hide_on_error" id="chk_follow_parent"><label><input type="checkbox" id="chk_follow" checked /> Change image with the presenter</label></p>
 		<p class="hide_on_error"><input type="button" id="btn_sync" value="Go to current image" /></p>
 		<p id="error_log"></p>
 		<iframe title="Stereoscopic (3D) photo viewer" id="stereopix_viewer"
