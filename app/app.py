@@ -74,6 +74,11 @@ def room_get_json(r):
         return json.loads(rooms[r].json)
     return {}
 
+def room_get_page(r):
+    if r in rooms:
+        return rooms[r].page
+    return 0
+
 async def presenter_msg(ws, json):
     room = ws.userData['room']
     if json['type'] == 'connection_closed':

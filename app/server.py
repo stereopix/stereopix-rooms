@@ -9,7 +9,7 @@ from aiohttp import web, hdrs
 from urllib.parse import quote, quote_plus, unquote_plus
 import asyncio
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
-from app import websocket_json_msg, is_opened, room_get_json, Kick
+from app import websocket_json_msg, is_opened, room_get_json,room_get_page, Kick
 
 allowed_origin_hosts = None
 stylestamp = str(int(os.path.getmtime('web/design/style.css')))
@@ -35,6 +35,10 @@ async def http_room_handler(request):
 async def http_room_list_json_handler(request):
     r = unquote_plus(request.match_info['room'])
     return web.json_response(room_get_json(r))
+
+async def http_room_page_handler(request):
+    r = unquote_plus(request.match_info['room'])
+    return web.Response(text=str(room_get_page(r)), content_type='text/plain')
 
 async def http_app_handler(request):
     data = await request.post()
@@ -116,6 +120,7 @@ async def start_server(host, port):
         web.get('/{room}', http_room_handler),
         web.get('/{room}/', http_room_handler),
         web.get('/{room}/list.json', http_room_list_json_handler),
+        web.get('/{room}/page.txt', http_room_page_handler),
         web.static('/', 'web'),
         ])
     runner = web.AppRunner(app)
