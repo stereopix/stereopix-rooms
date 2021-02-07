@@ -34,15 +34,27 @@ async def http_room_handler(request):
 
 async def http_room_list_json_handler(request):
     r = unquote_plus(request.match_info['room'])
-    return web.json_response(room_get_json(r))
+    ret = web.json_response(room_get_json(r))
+    ret.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    ret.headers["Pragma"] = "no-cache"
+    ret.headers["Expires"] = "0"
+    return ret
 
 async def http_room_page_handler(request):
     r = unquote_plus(request.match_info['room'])
-    return web.Response(text=str(room_get_page(r)), content_type='text/plain')
+    ret = web.Response(text=str(room_get_page(r)), content_type='text/plain')
+    ret.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    ret.headers["Pragma"] = "no-cache"
+    ret.headers["Expires"] = "0"
+    return ret
 
 async def http_room_opened_handler(request):
     r = unquote_plus(request.match_info['room'])
-    return web.Response(text=str(int(is_opened(r))), content_type='text/plain')
+    ret = web.Response(text=str(int(is_opened(r))), content_type='text/plain')
+    ret.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    ret.headers["Pragma"] = "no-cache"
+    ret.headers["Expires"] = "0"
+    return ret
 
 async def http_app_handler(request):
     data = await request.post()
