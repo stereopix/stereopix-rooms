@@ -69,6 +69,11 @@ class Room:
 def is_opened(r):
     return r in rooms and rooms[r].is_opened
 
+def room_get_json(r):
+    if is_opened(r):
+        return json.loads(rooms[r].json)
+    return {}
+
 async def presenter_msg(ws, json):
     room = ws.userData['room']
     if json['type'] == 'connection_closed':
