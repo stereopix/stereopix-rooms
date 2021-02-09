@@ -61,6 +61,9 @@ function connect(room) {
 	};
 }
 
+function move_forward() { document.getElementById("page").stepUp(1); }
+function move_backward() { document.getElementById("page").stepUp(-1); }
+
 window.addEventListener("DOMContentLoaded", (event) => {
 	document.getElementById("allow_stealing").checked = false;
 	document.getElementById("allow_stealing").addEventListener("change", e => {
@@ -135,6 +138,9 @@ window.addEventListener("pagehide", (event) => {
 			<input type="number" value="0" id="page" />
 			<br />
 			<input type="submit" />
+			<br />
+			<button onclick="move_backward()">Reverse</button>
+			<button onclick="move_forward()">Forward</button>
 		</form>
 		</div>
 	</body>
