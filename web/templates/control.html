@@ -37,6 +37,7 @@ function connect(room) {
 		} else if (j.type == 'room_stolen') {
 			document.getElementById("json_code").value = j.json;
 			document.getElementById("page").value = j.page;
+			process_json(j.json);
 
 		} else if (j.type == 'nb_connected') {
 			document.getElementById("connected_clients").innerText = j.nb;
@@ -64,6 +65,10 @@ function connect(room) {
 function move_forward() { document.getElementById("page").stepUp(1); }
 function move_backward() { document.getElementById("page").stepUp(-1); }
 
+function process_json(j) {
+	document.getElementById("page").max = (j && j.media && Array.isArray(j.media)) ? j.media.length - 1 : 0;
+}
+
 window.addEventListener("DOMContentLoaded", (event) => {
 	document.getElementById("allow_stealing").checked = false;
 	document.getElementById("allow_stealing").addEventListener("change", e => {
@@ -76,14 +81,19 @@ window.addEventListener("DOMContentLoaded", (event) => {
 		let j = null;
 		function send_code() {
 			try {
-				JSON.parse(code.value);
+				const parsed = JSON.parse(code.value);
 				j = code.value;
+				process_json(parsed);
 			} catch(e) {
 				alert("Invalid JSON syntax");
 				console.warn(e);
 			}
-			if (socket && j)
+			if (socket && j) {
 				socket.send(JSON.stringify({ 'type': 'open_room', 'json': j }));
+				const p = document.getElementById("page");
+				document.getElementById("btn_forward").disabled = (p.value >= p.max);
+				document.getElementById("btn_backward").disabled = (p.value <= 0);
+			}
 		}
 		if (code.value.trim().startsWith("https://")) {
 			const xhr = new XMLHttpRequest();
@@ -103,8 +113,11 @@ window.addEventListener("DOMContentLoaded", (event) => {
 	});
 	document.getElementById("page_form").addEventListener("submit", e => {
 		e.preventDefault();
+		const p = document.getElementById("page");
+		document.getElementById("btn_forward").disabled = (p.value >= p.max);
+		document.getElementById("btn_backward").disabled = (p.value <= 0);
 		if (socket)
-			socket.send(JSON.stringify({ 'type': 'change_page', 'page': document.getElementById("page").value }));
+			socket.send(JSON.stringify({ 'type': 'change_page', 'page': p.value }));
 	});
 	connect(room);
 });
@@ -135,12 +148,12 @@ window.addEventListener("pagehide", (event) => {
 
 		<h2>Page number</h2>
 		<form id="page_form">
-			<input type="number" value="0" id="page" />
+			<input type="number" value="0" min="0" id="page" />
 			<br />
 			<input type="submit" />
 			<br />
-			<button onclick="move_backward()">Reverse</button>
-			<button onclick="move_forward()">Forward</button>
+			<button id="btn_backward" onclick="move_backward()">Reverse</button>
+			<button id="btn_forward" onclick="move_forward()">Forward</button>
 		</form>
 		</div>
 	</body>
