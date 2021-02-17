@@ -119,6 +119,8 @@ window.addEventListener("DOMContentLoaded", (event) => {
 		if (socket)
 			socket.send(JSON.stringify({ 'type': 'change_page', 'page': p.value }));
 	});
+	document.getElementById("btn_forward").disabled = true;
+	document.getElementById("btn_backward").disabled = true;
 	connect(room);
 });
 window.addEventListener("beforeunload", e => {
@@ -148,7 +150,7 @@ window.addEventListener("pagehide", (event) => {
 
 		<h2>Page number</h2>
 		<form id="page_form">
-			<input type="number" value="0" min="0" id="page" />
+			<input type="number" value="0" min="0" max="0" id="page" />
 			<br />
 			<input type="submit" />
 			<br />
