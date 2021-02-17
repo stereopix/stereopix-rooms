@@ -114,8 +114,8 @@ window.addEventListener("DOMContentLoaded", (event) => {
 	document.getElementById("page_form").addEventListener("submit", e => {
 		e.preventDefault();
 		const p = document.getElementById("page");
-		document.getElementById("btn_forward").disabled = (p.value >= p.max);
-		document.getElementById("btn_backward").disabled = (p.value <= 0);
+		document.getElementById("btn_forward").disabled = (Number(p.value) >= Number(p.max));
+		document.getElementById("btn_backward").disabled = (Number(p.value) <= 0);
 		if (socket)
 			socket.send(JSON.stringify({ 'type': 'change_page', 'page': p.value }));
 	});
