@@ -62,10 +62,16 @@ function connect(room) {
 	};
 }
 
+let last_position = 0;
 function move_update() {
 	const p = document.getElementById("page");
 	document.getElementById("btn_forward").disabled = (Number(p.value) >= Number(p.max));
 	document.getElementById("btn_backward").disabled = (Number(p.value) <= 0);
+	const thx = document.getElementById("thumbs");
+	const thumbs = thx.getElementsByTagName('img');
+	if (last_position < thumbs.length) thumbs[last_position].classList.remove("active");
+	last_position = Number(p.value);
+	if (last_position < thumbs.length) thumbs[last_position].classList.add("active");
 	if (socket)
 		socket.send(JSON.stringify({ 'type': 'change_page', 'page': p.value }));
 }
@@ -82,6 +88,34 @@ function move_home() { move_to(0); }
 
 function process_json(j) {
 	document.getElementById("page").max = (j && j.media && Array.isArray(j.media)) ? j.media.length - 1 : 0;
+	const thx = document.getElementById("thumbs");
+	const frag = document.createDocumentFragment();
+	const h2 = document.createElement("h2");
+	h2.innerText = "Thumbnails";
+	frag.appendChild(h2);
+	thx.innerHTML = "";
+	if (j && j.media && Array.isArray(j.media)) {
+		let nb = 0;
+		for (const i in j.media) {
+			const p = j.media[i];
+			const img = document.createElement("img");
+			if (p.thumbnail) {
+				const u = Array.isArray(p.thumbnail) ? p.thumbnail[0] : p.thumbnail;
+				const baseurl = j.meta.url_base;
+				const url = (new URL(u, baseurl || undefined)).href
+				img.src = url;
+				nb++;
+			} else {
+				img.src = "/design/nothumb.png";
+			}
+			img.loading = "lazy";
+			img.dataset.nb = i;
+			img.addEventListener('click', (e) => { move_to(Number(img.dataset.nb)); });
+			frag.appendChild(img);
+		}
+		if (nb)
+			thx.appendChild(frag);
+	}
 }
 
 window.addEventListener("DOMContentLoaded", (event) => {
@@ -202,6 +236,8 @@ document.addEventListener('wheel', (event) => {
 			<button id="btn_backward" onclick="move_backward()">Reverse</button>
 			<button id="btn_forward" onclick="move_forward()">Forward</button>
 		</form>
+		</div>
+		<div id="thumbs" class="hide_on_error">
 		</div>
 	</body>
 </html>

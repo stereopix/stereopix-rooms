@@ -70,3 +70,14 @@ body.error .hide_on_error, body.error #stereopix_viewer {
 	max-width: 800px;
 	margin: 20px auto;
 }
+#thumbs {
+	padding: 20px 0;
+}
+#thumbs img {
+	border: 5px solid #000000;
+	vertical-align: middle;
+	margin: 4px;
+}
+#thumbs img.active {
+	border-color: #d00000;
+}
