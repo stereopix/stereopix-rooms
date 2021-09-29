@@ -180,6 +180,9 @@ window.addEventListener("pagehide", (event) => {
 		socket.close();
 });
 document.addEventListener('keydown', (event) => {
+	const activeTag = document.activeElement.tagName.toUpperCase();
+	if (activeTag == "TEXTAREA" || activeTag == "INPUT") return;
+
 	// Most PowerPoint Remotes send Keyboard Events PageUp (previous page) and PageDown (next page).
 	switch (event.code) {
 		case 'ArrowLeft':
