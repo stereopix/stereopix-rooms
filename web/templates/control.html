@@ -62,8 +62,32 @@ function connect(room) {
 	};
 }
 
-function move_forward() { document.getElementById("page").stepUp(1); }
-function move_backward() { document.getElementById("page").stepUp(-1); }
+function move_update() {
+	const p = document.getElementById("page");
+	document.getElementById("btn_forward").disabled = (Number(p.value) >= Number(p.max));
+	document.getElementById("btn_backward").disabled = (Number(p.value) <= 0);
+	if (socket)
+		socket.send(JSON.stringify({ 'type': 'change_page', 'page': p.value }));
+}
+function move_forward() {
+	const p = document.getElementById("page");
+	if (Number(p.value) < Number(p.max)) {
+		p.value = Number(p.value) + 1;
+		move_update();
+	}
+}
+function move_backward() {
+	const p = document.getElementById("page");
+	if (Number(p.value) > 0) {
+		p.value = Number(p.value) - 1;
+		move_update();
+	}
+}
+function move_home() {
+	const p = document.getElementById("page");
+	p.value = 0;
+	move_update();
+}
 
 function process_json(j) {
 	document.getElementById("page").max = (j && j.media && Array.isArray(j.media)) ? j.media.length - 1 : 0;
@@ -113,11 +137,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
 	});
 	document.getElementById("page_form").addEventListener("submit", e => {
 		e.preventDefault();
-		const p = document.getElementById("page");
-		document.getElementById("btn_forward").disabled = (Number(p.value) >= Number(p.max));
-		document.getElementById("btn_backward").disabled = (Number(p.value) <= 0);
-		if (socket)
-			socket.send(JSON.stringify({ 'type': 'change_page', 'page': p.value }));
+		move_update();
 	});
 	document.getElementById("btn_forward").disabled = true;
 	document.getElementById("btn_backward").disabled = true;
