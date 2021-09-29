@@ -69,25 +69,16 @@ function move_update() {
 	if (socket)
 		socket.send(JSON.stringify({ 'type': 'change_page', 'page': p.value }));
 }
-function move_forward() {
+function move_to(n) {
 	const p = document.getElementById("page");
-	if (Number(p.value) < Number(p.max)) {
-		p.value = Number(p.value) + 1;
+	if (n >= 0 && n <= Number(p.max)) {
+		p.value = n;
 		move_update();
 	}
 }
-function move_backward() {
-	const p = document.getElementById("page");
-	if (Number(p.value) > 0) {
-		p.value = Number(p.value) - 1;
-		move_update();
-	}
-}
-function move_home() {
-	const p = document.getElementById("page");
-	p.value = 0;
-	move_update();
-}
+function move_forward() { move_to(Number(document.getElementById("page").value)+1); }
+function move_backward() { move_to(Number(document.getElementById("page").value)-1); }
+function move_home() { move_to(0); }
 
 function process_json(j) {
 	document.getElementById("page").max = (j && j.media && Array.isArray(j.media)) ? j.media.length - 1 : 0;
