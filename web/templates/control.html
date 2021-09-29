@@ -153,67 +153,36 @@ window.addEventListener("pagehide", (event) => {
 	if (socket)
 		socket.close();
 });
-
-//	Most PowerPoint Remotes send Keyboard Events PageUp (previous page) and PageDown (next page).
-//	Add an Event Listener to handle Keyboard Events from most PowerPoint Remotes, as well Arrow Keys on the Keyboard.
-//	Herb Weiner <herbw@wiskit.com> 2021-09-22
-
-document.addEventListener('keydown', (event) =>
-{
-	const p		= document.getElementById("page");
-	var name	= event.key;
-	var code	= event.code;
-
-	switch (code)
-	{
+document.addEventListener('keydown', (event) => {
+	// Most PowerPoint Remotes send Keyboard Events PageUp (previous page) and PageDown (next page).
+	switch (event.code) {
 		case 'ArrowLeft':
 		case 'ArrowUp':
 		case 'PageUp':
-		//	if (p.value > 0)
-				move_backward ();
+			move_backward ();
 			break;
 
 		case 'ArrowRight':
 		case 'ArrowDown':
 		case 'PageDown':
-		//	if (p.value < p.max)
-				move_forward ();
+			move_forward ();
 			break;
 
 		case 'Home':
-			p.value = 0;
+			move_home();
 			break;
 
 		default:
 	}
-
-	if (socket)
-		socket.send (JSON.stringify ({ 'type': 'change_page', 'page': p.value}));
-
 }, false);
-
-//	A few PowerPoint Remotes send MouseWheel Events. A negative number (e.g. -40)
-//	moves to the previous page, and a positive number (e.g. 40) moves to the next page.
-//	Add an Event Listener to handle Mouse Wheel Events for these less common PowerPoint Remotes.
-//	Herb Weiner <herbw@wiskit.com> 2021-09-22
-
-document.addEventListener('wheel', (event) =>
-{
-	const p		= document.getElementById("page");
-
-//	if ((event.deltaY < 0) && (p.value > 0))
+document.addEventListener('wheel', (event) => {
+	// A few PowerPoint Remotes send MouseWheel Events.
+	// A negative number (e.g. -40) moves to the previous page, and a positive number (e.g. 40) moves to the next page.
 	if (event.deltaY < 0)
 		move_backward ();
-
-//	if ((event.deltaY > 0) && (p.value < p.max))
 	if (event.deltaY > 0)
 		move_forward ();
-
-	if (socket)
-		socket.send (JSON.stringify ({ 'type': 'change_page', 'page': p.value}));
-
 }, false);
-
 		</script>
 		<p>Room name: <span id="room_name">Unknown</span></p>
 		<p>Connected: <span id="connected">No</span></p>
