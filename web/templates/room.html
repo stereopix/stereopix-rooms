@@ -25,6 +25,10 @@ window.addEventListener('message', function(e) {
 			}
 			if (current_page)
 				viewer.postMessage({'stereopix_action': 'goto', 'position': current_page}, 'https://stereopix.net');
+		} else if (e.data.type == 'mediumChanged') {
+			var caption = '';
+			if (e.data.extra && e.data.extra.rooms_caption) caption = e.data.extra.rooms_caption;
+			document.getElementById('caption').textContent = caption;
 		}
 	}
 });
@@ -77,6 +81,7 @@ function connect(room) {
 			console.log('[close] Connection died');
 		}
 		document.getElementById("connected").innerText = "No";
+		document.getElementById('caption').textContent = "";
 		document.body.classList.add('error');
 	};
 
@@ -155,5 +160,6 @@ window.addEventListener("DOMContentLoaded", function(event) {
 			style="width: 100%; height: 960px; max-height: 100vh; max-width: 100vw; border: 2px solid black; margin: 8px 0;" 
 			allowfullscreen="yes" allowvr="yes" allow="fullscreen;xr-spatial-tracking;accelerometer;gyroscope" 
 			src="https://stereopix.net/viewer:embed/"></iframe>
+		<p id="caption"></p>
 	</body>
 </html>
