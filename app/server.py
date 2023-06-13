@@ -145,6 +145,8 @@ async def start_server(host, port):
     site = web.TCPSite(runner, host, port)
     await site.start()
     print(f'Listening {host}:{port}')
+    while True:
+        await asyncio.sleep(10)
 
 if __name__ == '__main__':
     host = '0.0.0.0'
@@ -157,8 +159,6 @@ if __name__ == '__main__':
         port = sys.argv[1]
     print('Allowed origins:', '*' if not allowed_origin_hosts else ', '.join(allowed_origin_hosts))
     try:
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(start_server(host, port))
-        loop.run_forever()
+        asyncio.run(start_server(host, port))
     except KeyboardInterrupt:
         print('Bye.')
