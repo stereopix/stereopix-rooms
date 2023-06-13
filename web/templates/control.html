@@ -216,13 +216,16 @@ document.addEventListener('wheel', (event) => {
 		move_forward ();
 }, false);
 		</script>
-		<p>Room name: <span id="room_name">Unknown</span></p>
-		<p>Connected: <span id="connected">No</span></p>
-		<p class="hide_on_error">Connected clients: <span id="connected_clients">0</span></p>
-		<p id="error_log"></p>
-		<div id="presenter_block" class="hide_on_error">
-		<p><label><input type="checkbox" id="allow_stealing" />Allow stealing of the room</label></p>
-		<p><label><input type="checkbox" id="wheel_remote" />Allow wheel-style remotes</label></p>
+		<div class="box">
+			<p>Room name: <b><span id="room_name">Unknown</span></b></p>
+			<p>Connected: <b><span id="connected">No</span></b></p>
+			<p class="hide_on_error">Connected clients: <b><span id="connected_clients">0</span></b></p>
+			<p id="error_log"></p>
+			<div class="hide_on_error">
+				<p><label><input type="checkbox" id="allow_stealing" /> Allow stealing of the room</label></p>
+				<p><label><input type="checkbox" id="wheel_remote" /> Allow wheel-style remotes</label></p>
+			</div>
+		</div>
 		<h2>JSON</h2>
 		<form id="json_form">
 			<p id="json_code_note">Note: The content should be a valid JSON suitable for the viewer of Stereopix (see <a href="https://stereopix.github.io/viewer-examples/020_01_advanced_json_file/list.json" target="_blank">example</a> and the help of Stereopix for advanced usages) or the address where such file can be loaded (with appropriate cross-origin headers).</p>

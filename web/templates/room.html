@@ -151,11 +151,13 @@ window.addEventListener("DOMContentLoaded", function(event) {
 	xhr.send("");
 });
 		</script>
-		<p>Room name: <span id="room_name">Unknown</span></p>
-		<p>Connected: <span id="connected">No</span></p>
-		<p class="hide_on_error" id="chk_follow_parent"><label><input type="checkbox" id="chk_follow" checked /> Change image with the presenter</label></p>
-		<p class="hide_on_error"><input type="button" id="btn_sync" value="Go to current image" /></p>
-		<p id="error_log"></p>
+		<div class="box">
+			<p>Room name: <b><span id="room_name">Unknown</span></b></p>
+			<p>Connected: <b><span id="connected">No</span></b></p>
+			<p class="hide_on_error" id="chk_follow_parent"><label><input type="checkbox" id="chk_follow" checked /> Change image with the presenter</label></p>
+			<p class="hide_on_error"><input type="button" id="btn_sync" value="Go to current image" /></p>
+			<p id="error_log"></p>
+		</div>
 		<iframe title="Stereoscopic (3D) photo viewer" id="stereopix_viewer"
 			style="width: 100%; height: 960px; max-height: 100vh; max-width: 100vw; border: 2px solid black; margin: 8px 0;" 
 			allowfullscreen="yes" allowvr="yes" allow="fullscreen;xr-spatial-tracking;accelerometer;gyroscope" 

@@ -26,6 +26,9 @@ a {
 	text-decoration: none;
 	color: #969;
 }
+p {
+	margin: 5px;
+}
 #error_log {
 	font-weight: bold;
 	color: #f00000;
